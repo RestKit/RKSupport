@@ -1,0 +1,17 @@
+PODS:
+  - Expecta (0.2.2)
+  - RKPathTemplate (1.0.0)
+
+DEPENDENCIES:
+  - Expecta (~> 0.2.1)
+  - RKPathTemplate (from `.`)
+
+EXTERNAL SOURCES:
+  RKPathTemplate:
+    :path: .
+
+SPEC CHECKSUMS:
+  Expecta: 99adbb2e366a02796477523bfd426143350d9caf
+  RKPathTemplate: 30f1eb916c3e173543fb8cbd1d512ae7c14b5be1
+
+COCOAPODS: 0.28.0

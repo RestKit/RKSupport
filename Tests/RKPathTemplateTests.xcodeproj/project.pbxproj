@@ -14,6 +14,8 @@
 		25A0136617DBC225006C2BD6 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25A0136517DBC225006C2BD6 /* Cocoa.framework */; };
 		3515F08DE8EE495D968E7CDA /* libPods-osx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 169BB4EE1051441592FCCA22 /* libPods-osx.a */; };
 		AF161B4D21694D2493A63064 /* libPods-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C4355EA794D84F2BB2496AF8 /* libPods-ios.a */; };
+		FC0219151841784900771C5E /* RKPathTemplateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FC0219141841784900771C5E /* RKPathTemplateTests.m */; };
+		FC0219161841784900771C5E /* RKPathTemplateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FC0219141841784900771C5E /* RKPathTemplateTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +34,7 @@
 		B6DF6DD3C6C0407A8FA9E1F2 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C4355EA794D84F2BB2496AF8 /* libPods-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF2E27B855724C1EA1E411FD /* Pods-osx.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-osx.xcconfig"; path = "../Pods/Pods-osx.xcconfig"; sourceTree = "<group>"; };
+		FC0219141841784900771C5E /* RKPathTemplateTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPathTemplateTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +65,7 @@
 		25A0133C17DBC1F4006C2BD6 = {
 			isa = PBXGroup;
 			children = (
+				FC73070E184152160054FED5 /* Tests */,
 				25A0134A17DBC212006C2BD6 /* Frameworks */,
 				25A0134917DBC212006C2BD6 /* Products */,
 				1F3A5CFBB81D4B8BB4EB3D03 /* Pods.xcconfig */,
@@ -102,6 +106,14 @@
 				25A0136A17DBC225006C2BD6 /* Foundation.framework */,
 			);
 			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		FC73070E184152160054FED5 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				FC0219141841784900771C5E /* RKPathTemplateTests.m */,
+			);
+			name = Tests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -284,6 +296,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC0219151841784900771C5E /* RKPathTemplateTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -291,6 +304,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC0219161841784900771C5E /* RKPathTemplateTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

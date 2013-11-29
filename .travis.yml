@@ -1,0 +1,8 @@
+language: objective-c
+before_install:
+    - brew update
+    - brew uninstall xctool && brew install xctool
+install:
+    - bundle install
+    - bundle exec pod install
+script: bundle exec rake test

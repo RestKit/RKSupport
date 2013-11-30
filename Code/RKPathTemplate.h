@@ -19,7 +19,6 @@
 //
 
 #import <Foundation/Foundation.h>
-
 /**
  Design Points:
 
@@ -42,11 +41,17 @@
 
 // Returns a set of strings specifying the variables of the receiver.
 @property (nonatomic, readonly) NSSet *variables;
-
 /**
- Returns `YES` on a successful match. `variables` arg is optional, but should be a dictionary of the
+ Returns `YES` on a successful match. `variables` arg is optional, but should be a dictionary of the variables and values.
  */
 - (BOOL)matchesPath:(NSString *)path variables:(NSDictionary **)variables;
+/**
+ Evaluates the given path against the receiver and returns a Boolean value indicating if the match was successful, optionally returning a dictionary of values keyed by variable name matched from the given path.
+ 
+ @param path The path to evaluate against the receiver. Cannot be nil.
+ @param variables A pointer to a dictionary object that will be set upon successful matching. May be nil.
+ @return A Boolean value indicating if the match was successful.
+ */
 - (NSString *)expandWithVariables:(NSDictionary *)variables;
 
 @end

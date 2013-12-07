@@ -20,26 +20,6 @@
 
 #import "RKPathTemplate.h"
 
-NSUInteger RKNumberOfLeftBracesInString(NSString *string)
-{
-    static NSRegularExpression *regex = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        regex = [NSRegularExpression regularExpressionWithPattern:@"[{]" options:NSRegularExpressionCaseInsensitive error:nil];
-    });
-    return [regex numberOfMatchesInString:string options:0 range:NSMakeRange(0, [string length])];
-}
-
-NSUInteger RKNumberOfRightBracesInString(NSString *string)
-{
-    static NSRegularExpression *regex = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        regex = [NSRegularExpression regularExpressionWithPattern:@"[}]" options:NSRegularExpressionCaseInsensitive error:nil];
-    });
-    return [regex numberOfMatchesInString:string options:0 range:NSMakeRange(0, [string length])];
-}
-
 NSUInteger RKNumberOfSlashesInString(NSString *string)
 {
     static NSRegularExpression *regex = nil;
@@ -48,19 +28,6 @@ NSUInteger RKNumberOfSlashesInString(NSString *string)
         regex = [NSRegularExpression regularExpressionWithPattern:@"/" options:NSRegularExpressionCaseInsensitive error:nil];
     });
     return [regex numberOfMatchesInString:string options:0 range:NSMakeRange(0, [string length])];
-}
-
-NSArray *RKComponentsOfStringMatchingRegexPattern(NSString *string, NSString *pattern)
-{
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:NSRegularExpressionCaseInsensitive error:nil];
-    NSMutableArray *matches = [NSMutableArray new];
-    [regex enumerateMatchesInString:string options:NSMatchingReportProgress range:NSMakeRange(0, [string length]) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
-        if ([[string substringWithRange:result.range] length] > 0) {
-            NSRange range = NSMakeRange(result.range.location + 1, result.range.length - 2);
-            [matches addObject:[string substringWithRange:range]];
-        }
-    }];
-    return matches;
 }
 
 BOOL RKIsValidSetOfVariables(NSSet *variables)

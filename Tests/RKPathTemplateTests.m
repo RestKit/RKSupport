@@ -24,10 +24,7 @@
 #import <RKSupport/RKPathTemplate.h>
 
 @interface RKPathTemplate ()
-NSUInteger RKNumberOfLeftBracesInString(NSString *string);
-NSUInteger RKNumberOfRightBracesInString(NSString *string);
 NSUInteger RKNumberOfSlashesInString(NSString *string);
-NSArray *RKComponentsOfStringMatchingRegexPattern(NSString *string, NSString *pattern);
 BOOL RKStringHasBraceCharacters(NSString *string);
 BOOL RKIsValidSetOfVariables(NSArray *variables);
 @end
@@ -36,16 +33,6 @@ BOOL RKIsValidSetOfVariables(NSArray *variables);
 @end
 
 @implementation RKPathTemplateTests
-
-- (void)testNumberOfLeftBracesInString
-{
-    expect(RKNumberOfLeftBracesInString(@"{")).to.equal(1);
-}
-
-- (void)testNumberOfRightBracesInString
-{
-    expect(RKNumberOfRightBracesInString(@"}")).to.equal(1);
-}
 
 - (void)testNumberOfSlashesInString
 {
@@ -73,15 +60,6 @@ BOOL RKIsValidSetOfVariables(NSArray *variables);
     expect(^{ RKIsValidSetOfVariables(@[ @"variable_one", @"variable_two", @"variable_three" ]); }).toNot.raise(NSInvalidArgumentException);
     expect(^{ RKIsValidSetOfVariables(@[ @"variable_one", @"variable_two", @"variable_three" ]); }).to.beTruthy();
     expect(^{ RKIsValidSetOfVariables(@[ @"variable-one", @"variable-two", @"variable-three" ]); }).to.raise(NSInvalidArgumentException);
-}
-
-- (void)testComponentsOfStringMatchingPattern
-{
-    NSArray *matches = @[ @"one", @"two", @"three" ];
-    NSString *pattern = @"\\{(.*?)\\}";
-    expect(RKComponentsOfStringMatchingRegexPattern(@"/{one}/{two}/{three}", pattern)).to.equal(matches);
-    expect([RKComponentsOfStringMatchingRegexPattern(@"/{one}/{two}/{three}", pattern) count]).to.equal(3);
-    expect(RKComponentsOfStringMatchingRegexPattern(@"/one/two/three", pattern)).to.beEmpty();
 }
 
 - (void)testInitThrowsInvalidExceptionWithNilString

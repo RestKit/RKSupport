@@ -1,1 +1,24 @@
-<?xml version='1.0' encoding='UTF-8'?><Workspace version='1.0'><FileRef location='group:Tests/RKSupportTests.xcodeproj'/><FileRef location='group:Pods/Pods.xcodeproj'/></Workspace>
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <Group
+      location = "group:Code"
+      name = "Code">
+      <Group
+         location = "group:RKPathTemplate"
+         name = "RKPathTemplate">
+         <FileRef
+            location = "group:RKPathTemplate.h">
+         </FileRef>
+         <FileRef
+            location = "group:RKPathTemplate.m">
+         </FileRef>
+      </Group>
+   </Group>
+   <FileRef
+      location = "group:Tests/RKSupportTests.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Pods/Pods.xcodeproj">
+   </FileRef>
+</Workspace>

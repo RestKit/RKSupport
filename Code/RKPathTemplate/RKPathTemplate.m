@@ -63,7 +63,7 @@ NSArray *RKComponentsOfStringMatchingRegexPattern(NSString *string, NSString *pa
     return matches;
 }
 
-BOOL *RKVariableStringsInArrayAreValid(NSArray *variables)
+BOOL RKIsValidSetOfVariables(NSSet *variables)
 {
     NSMutableCharacterSet *parameterCharacterSet = [NSMutableCharacterSet alphanumericCharacterSet];
     [parameterCharacterSet addCharactersInString:@"._{}"];
@@ -84,6 +84,59 @@ BOOL *RKStringHasBraceCharacters(NSString *string)
     return YES;
 }
 
+static NSSet *RKScanVariablesFromString(NSString *string)
+{
+    NSMutableSet *variables = [NSMutableSet set];
+    for (NSString *component in [string componentsSeparatedByString:@"/"]) {
+        BOOL parsedVariableForComponent = NO;
+        NSScanner *scanner = [NSScanner scannerWithString:component];
+        [scanner setCharactersToBeSkipped:nil]; // NSScanner skips whitespace by default
+
+        while (![scanner isAtEnd]) {
+            NSString *variable = nil;
+            [scanner scanUpToString:@"{" intoString:&variable];
+            NSUInteger index = ([scanner isAtEnd] ? [scanner scanLocation] - 1 : [scanner scanLocation]);
+            BOOL foundOpeningBrace = ([component characterAtIndex:index] == '{');
+
+            if (foundOpeningBrace) {
+                if (![scanner isAtEnd]) [scanner setScanLocation:[scanner scanLocation] + 1];
+            } else {
+                if (variable && [variable rangeOfString:@"}"].location != NSNotFound) {
+                    [NSException raise:NSInvalidArgumentException format:@"Invalid path template: Unopened variable encountered. A '}' character must be preceded by a '{' character."];
+                }
+
+                // No opening brace found, there's no variable to parse
+                break;
+            }
+
+            variable = nil;
+            [scanner scanUpToString:@"}" intoString:&variable];
+            index = ([scanner isAtEnd] ? [scanner scanLocation] - 1 : [scanner scanLocation]);
+            if (variable && ![scanner isAtEnd]) [scanner setScanLocation:[scanner scanLocation] + 1];
+            if ([component characterAtIndex:index] == '}') {
+                if ([variable length] == 0) { // /{}
+                    [NSException raise:NSInvalidArgumentException format:@"Invalid path template: '{}' is not a valid variable specifier."];
+                }
+                if ([variable rangeOfString:@"{"].length > 0) { // /{variable{whatever}
+                    [NSException raise:NSInvalidArgumentException format:@"Invalid path template: Unclosed variable encountered. A '{' character must be followed by a '}' character."];
+                }
+                if ([variables containsObject:variable]) { // /{variable}/{variable}
+                    [NSException raise:NSInvalidArgumentException format:@"Invalid path template: variable names must be unique."];
+                }
+                if (parsedVariableForComponent) {
+                    [NSException raise:NSInvalidArgumentException format:@"Invalid path template: A path component can only contain a single variable specifier."];
+                }
+
+                [variables addObject:variable];
+                parsedVariableForComponent = YES;
+            } else if (foundOpeningBrace) {
+                [NSException raise:NSInvalidArgumentException format:@"Invalid path template: Unclosed variable encountered. A '{' character must be followed by a '}' character."];
+            }
+        }
+    }
+    return variables;
+}
+
 @interface RKPathTemplateComponent : NSObject
 @property (nonatomic, strong) NSSet *variables;
 - (id)initWithString:(NSString *)string;
@@ -94,17 +147,11 @@ BOOL *RKStringHasBraceCharacters(NSString *string)
 
 @implementation RKPathTemplateComponent
 
-static NSString *RKPathTemplateVariableRegexPatternString = @"\\{(.*?)\\}";
-
 - (id)initWithString:(NSString *)string
 {
     if (self == [super init]) {
         self.path = string;
-        if (RKStringHasBraceCharacters(string)) {
-            self.variables = [NSSet setWithArray:RKComponentsOfStringMatchingRegexPattern(string, RKPathTemplateVariableRegexPatternString)];
-        } else {
-            self.variables = [NSSet set];
-        }
+        self.variables = RKScanVariablesFromString(string);
     }
     return self;
 }
@@ -257,16 +304,12 @@ static NSString *RKPathTemplateVariableRegexPatternString = @"\\{(.*?)\\}";
     if ([[string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] length] == 0) {
         @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Path Template String Should Not Be Composed of All Whitespace." userInfo:nil];
     }
-    
-    if (RKNumberOfLeftBracesInString(string) != RKNumberOfRightBracesInString(string)) {
-        @throw [NSException exceptionWithName:NSInvalidArgumentException reason:[NSString stringWithFormat:@"Path Template String Contains Left Braces:%lu Right Braces:%lu", RKNumberOfLeftBracesInString(string),RKNumberOfRightBracesInString(string)] userInfo:nil];
-    }
-    
+
     if (self = [super init]) {
         self.pathTemplate = [string copy];
-        NSArray *variables = RKComponentsOfStringMatchingRegexPattern(string, RKPathTemplateVariableRegexPatternString);
-        if (RKVariableStringsInArrayAreValid(variables)) {
-            self.variables = [NSSet setWithArray:variables];
+        NSArray *variables = RKScanVariablesFromString(string);
+        if (RKIsValidSetOfVariables(variables)) {
+            self.variables = variables;
         }
 
         NSMutableArray *pathComponents = [NSMutableArray arrayWithCapacity:[[string pathComponents] count]];

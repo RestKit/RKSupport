@@ -28,8 +28,8 @@ NSUInteger RKNumberOfLeftBracesInString(NSString *string);
 NSUInteger RKNumberOfRightBracesInString(NSString *string);
 NSUInteger RKNumberOfSlashesInString(NSString *string);
 NSArray *RKComponentsOfStringMatchingRegexPattern(NSString *string, NSString *pattern);
-BOOL *RKStringHasBraceCharacters(NSString *string);
-BOOL *RKVariableStringsInArrayAreValid(NSArray *variables);
+BOOL RKStringHasBraceCharacters(NSString *string);
+BOOL RKIsValidSetOfVariables(NSArray *variables);
 @end
 
 @interface RKPathTemplateTests : SenTestCase
@@ -64,15 +64,15 @@ BOOL *RKVariableStringsInArrayAreValid(NSArray *variables);
 
 - (void)testVariablesStringInArrayAreValid
 {
-    expect(^{ RKVariableStringsInArrayAreValid(@[ @"", @"", @""]); }).to.raise(NSInvalidArgumentException);
-    expect(^{ RKVariableStringsInArrayAreValid(@[ @"!@#$%^", @")(*!@#$", @"^$%@$@#$"]); }).to.raise(NSInvalidArgumentException);
-    expect(^{ RKVariableStringsInArrayAreValid(@[ @"{!@#$%^}", @"{)(*!@#$}", @"{^$%@$@#$}"]); }).to.raise(NSInvalidArgumentException);
-    expect(^{ RKVariableStringsInArrayAreValid(@[]); }).toNot.raise(NSInvalidArgumentException);
-    expect(^{ RKVariableStringsInArrayAreValid(@[ @"one", @"two", @"three" ]); }).toNot.raise(NSInvalidArgumentException);
-    expect(^{ RKVariableStringsInArrayAreValid(@[ @"one", @"two", @"three" ]); }).to.beTruthy();
-    expect(^{ RKVariableStringsInArrayAreValid(@[ @"variable_one", @"variable_two", @"variable_three" ]); }).toNot.raise(NSInvalidArgumentException);
-    expect(^{ RKVariableStringsInArrayAreValid(@[ @"variable_one", @"variable_two", @"variable_three" ]); }).to.beTruthy();
-    expect(^{ RKVariableStringsInArrayAreValid(@[ @"variable-one", @"variable-two", @"variable-three" ]); }).to.raise(NSInvalidArgumentException);
+    expect(^{ RKIsValidSetOfVariables(@[ @"", @"", @""]); }).to.raise(NSInvalidArgumentException);
+    expect(^{ RKIsValidSetOfVariables(@[ @"!@#$%^", @")(*!@#$", @"^$%@$@#$"]); }).to.raise(NSInvalidArgumentException);
+    expect(^{ RKIsValidSetOfVariables(@[ @"{!@#$%^}", @"{)(*!@#$}", @"{^$%@$@#$}"]); }).to.raise(NSInvalidArgumentException);
+    expect(^{ RKIsValidSetOfVariables(@[]); }).toNot.raise(NSInvalidArgumentException);
+    expect(^{ RKIsValidSetOfVariables(@[ @"one", @"two", @"three" ]); }).toNot.raise(NSInvalidArgumentException);
+    expect(^{ RKIsValidSetOfVariables(@[ @"one", @"two", @"three" ]); }).to.beTruthy();
+    expect(^{ RKIsValidSetOfVariables(@[ @"variable_one", @"variable_two", @"variable_three" ]); }).toNot.raise(NSInvalidArgumentException);
+    expect(^{ RKIsValidSetOfVariables(@[ @"variable_one", @"variable_two", @"variable_three" ]); }).to.beTruthy();
+    expect(^{ RKIsValidSetOfVariables(@[ @"variable-one", @"variable-two", @"variable-three" ]); }).to.raise(NSInvalidArgumentException);
 }
 
 - (void)testComponentsOfStringMatchingPattern
@@ -117,6 +117,67 @@ BOOL *RKVariableStringsInArrayAreValid(NSArray *variables);
     expect([template1 hash]).toNot.equal([template2 hash]);
 }
 
+- (void)testParsingStringWithoutVariables
+{
+    RKPathTemplate *template = [[RKPathTemplate alloc] initWithString:@"/variable"];
+    expect(template.variables).to.beEmpty();
+}
+
+- (void)testParsingStringComposedEntirelyOfVariable
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/{variable}"]; }).notTo.raise(NSInvalidArgumentException);
+}
+
+- (void)testParsingVariableWithoutNameRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/{}"]; }).to.raiseWithReason(NSInvalidArgumentException, @"Invalid path template: '{}' is not a valid variable specifier.");
+}
+
+- (void)testParsingUnopenedVariableAtEndOfStringRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/variable}"]; }).to.raiseWithReason(NSInvalidArgumentException, @"Invalid path template: Unopened variable encountered. A '}' character must be preceded by a '{' character.");
+}
+
+- (void)testParsingUnopenedVariableRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/variable}/whatever"]; }).to.raiseWithReason(NSInvalidArgumentException, @"Invalid path template: Unopened variable encountered. A '}' character must be preceded by a '{' character.");
+}
+
+- (void)testParsingUnclosedVariableRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/{variable"]; }).to.raiseWithReason(NSInvalidArgumentException, @"Invalid path template: Unclosed variable encountered. A '{' character must be followed by a '}' character.");
+}
+
+- (void)testParsingDuplicatedVariableNameRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/{variable}/{variable}/end"]; }).to.raiseWithReason(NSInvalidArgumentException, @"Invalid path template: variable names must be unique.");
+}
+
+- (void)testParsingUnclosedCurlyBraceRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/{first_variable/{second_variable}"]; }).to.raise(NSInvalidArgumentException);
+}
+
+- (void)testParsingClosedBraceThatWasNotOpenedRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/first_variable}"]; }).to.raise(NSInvalidArgumentException);
+}
+
+- (void)testParsingVariableWithInvalidOperatorRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/{++var}"]; }).to.raise(NSInvalidArgumentException);
+}
+
+- (void)testParsingVariableWithInvalidVariableKeyRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/{var-name}"]; }).to.raise(NSInvalidArgumentException);
+}
+
+- (void)testThatAttemptToParseComponentContainingTwoVariablesRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/{variable1}_{variable2}"]; }).to.raiseWithReason(NSInvalidArgumentException, @"Invalid path template: A path component can only contain a single variable specifier.");
+}
+
 - (void)testVariablesAreCorrectlyParsed
 {
     RKPathTemplate *template = [[RKPathTemplate alloc] initWithString:@"/{first_variable}/{second_variable}/{third_variable}.json"];
@@ -125,26 +186,6 @@ BOOL *RKVariableStringsInArrayAreValid(NSArray *variables);
     expect([[template variables] containsObject:@"third_variable"]).to.equal(YES);
     template = [[RKPathTemplate alloc] initWithString:@"/first_variable/second_variable/third_variable.json"];
     expect([template variables]).to.beEmpty();
-}
-
-- (void)testErrorIsReturnedOnAttemptToParseTemplateWithUnclosedCurlyBrace
-{
-    expect(^{ (void)[[RKPathTemplate alloc] initWithString:@"/{first_variable"]; }).to.raise(NSInvalidArgumentException);
-    expect(^{ (void)[[RKPathTemplate alloc] initWithString:@"/{first_variable/{second_variable}"]; }).to.raise(NSInvalidArgumentException);
-}
-
-- (void)testErrorIsReturnedOnAttemptToParseTemplateWithClosedBraceThatWasNotOpened
-{
-    expect(^{ (void)[[RKPathTemplate alloc] initWithString:@"/first_variable}"]; }).to.raise(NSInvalidArgumentException);
-}
-
-- (void)testErrorIsReturnedOnAttemptToParseVariableWithInvalidOperator
-{
-    expect(^{ (void)[[RKPathTemplate alloc] initWithString:@"/{++var}"]; }).to.raise(NSInvalidArgumentException);
-}
--(void)testErrorIsReturnedOnAttemptToParseVariableWithInvalidVariableKey
-{
-    expect(^{ (void)[[RKPathTemplate alloc] initWithString:@"/{var-name}"]; }).to.raise(NSInvalidArgumentException);
 }
 
 #pragma mark - String Expansion

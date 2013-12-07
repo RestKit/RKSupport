@@ -21,7 +21,7 @@
 #import <SenTestingKit/SenTestingKit.h>
 #define EXP_SHORTHAND
 #import "Expecta.h"
-#import "RKPathTemplate.h"
+#import <RKSupport/RKPathTemplate.h>
 
 @interface RKPathTemplate ()
 NSUInteger RKNumberOfLeftBracesInString(NSString *string);

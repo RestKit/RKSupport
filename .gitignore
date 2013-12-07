@@ -17,5 +17,7 @@ DerivedData
 *.hmap
 *.xccheckout
 
+Tests/RKSupportTests.xcodeproj/xcshareddata/
+
 #CocoaPods
 Pods

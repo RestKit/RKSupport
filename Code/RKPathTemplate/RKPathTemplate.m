@@ -60,15 +60,12 @@ static NSSet *RKScanVariablesFromString(NSString *string)
         [scanner setCharactersToBeSkipped:nil]; // NSScanner skips whitespace by default
 
         while (![scanner isAtEnd]) {
-            NSString *variable = nil;
-            [scanner scanUpToString:@"{" intoString:&variable];
+            // Scan the path component up to our opening variable delimiter (if any) and validate preamble syntax
+            NSString *preamble = nil;
+            [scanner scanUpToString:@"{" intoString:&preamble];
             NSUInteger index = ([scanner isAtEnd] ? [scanner scanLocation] - 1 : [scanner scanLocation]);
-            BOOL foundOpeningBrace = ([component characterAtIndex:index] == '{');
-
-            if (foundOpeningBrace) {
-                if (![scanner isAtEnd]) [scanner setScanLocation:[scanner scanLocation] + 1];
-            } else {
-                if (variable && [variable rangeOfString:@"}"].location != NSNotFound) {
+            if ([component characterAtIndex:index] != '{') {
+                if (preamble && [preamble rangeOfString:@"}"].location != NSNotFound) { // /path}
                     [NSException raise:NSInvalidArgumentException format:@"Invalid path template: Unopened variable encountered. A '}' character must be preceded by a '{' character."];
                 }
 
@@ -76,29 +73,30 @@ static NSSet *RKScanVariablesFromString(NSString *string)
                 break;
             }
 
-            variable = nil;
+            // Scan from current location through the closing variable delimiter and validate the variable component
+            NSString *variable = nil;
+            if (![scanner isAtEnd]) [scanner setScanLocation:[scanner scanLocation] + 1];
             [scanner scanUpToString:@"}" intoString:&variable];
             index = ([scanner isAtEnd] ? [scanner scanLocation] - 1 : [scanner scanLocation]);
             if (variable && ![scanner isAtEnd]) [scanner setScanLocation:[scanner scanLocation] + 1];
-            if ([component characterAtIndex:index] == '}') {
-                if ([variable length] == 0) { // /{}
-                    [NSException raise:NSInvalidArgumentException format:@"Invalid path template: '{}' is not a valid variable specifier."];
-                }
-                if ([variable rangeOfString:@"{"].length > 0) { // /{variable{whatever}
-                    [NSException raise:NSInvalidArgumentException format:@"Invalid path template: Unclosed variable encountered. A '{' character must be followed by a '}' character."];
-                }
-                if ([variables containsObject:variable]) { // /{variable}/{variable}
-                    [NSException raise:NSInvalidArgumentException format:@"Invalid path template: variable names must be unique."];
-                }
-                if (parsedVariableForComponent) {
-                    [NSException raise:NSInvalidArgumentException format:@"Invalid path template: A path component can only contain a single variable specifier."];
-                }
-
-                [variables addObject:variable];
-                parsedVariableForComponent = YES;
-            } else if (foundOpeningBrace) {
+            if ([component characterAtIndex:index] != '}') { // /{variable
                 [NSException raise:NSInvalidArgumentException format:@"Invalid path template: Unclosed variable encountered. A '{' character must be followed by a '}' character."];
             }
+            if ([variable length] == 0) { // /{}
+                [NSException raise:NSInvalidArgumentException format:@"Invalid path template: '{}' is not a valid variable specifier."];
+            }
+            if ([variable rangeOfString:@"{"].length > 0) { // /{variable{
+                [NSException raise:NSInvalidArgumentException format:@"Invalid path template: Unclosed variable encountered. A '{' character must be followed by a '}' character."];
+            }
+            if ([variables containsObject:variable]) { // /{variable}/{variable}
+                [NSException raise:NSInvalidArgumentException format:@"Invalid path template: variable names must be unique."];
+            }
+            if (parsedVariableForComponent) { // /{variable1}_{variable2}
+                [NSException raise:NSInvalidArgumentException format:@"Invalid path template: A path component can only contain a single variable specifier."];
+            }
+
+            [variables addObject:variable];
+            parsedVariableForComponent = YES;
         }
     }
     return variables;

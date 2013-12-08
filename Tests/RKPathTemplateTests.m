@@ -24,28 +24,15 @@
 #import <RKSupport/RKPathTemplate.h>
 
 @interface RKPathTemplate ()
-NSUInteger RKNumberOfLeftBracesInString(NSString *string);
-NSUInteger RKNumberOfRightBracesInString(NSString *string);
 NSUInteger RKNumberOfSlashesInString(NSString *string);
-NSArray *RKComponentsOfStringMatchingRegexPattern(NSString *string, NSString *pattern);
-BOOL *RKStringHasBraceCharacters(NSString *string);
-BOOL *RKVariableStringsInArrayAreValid(NSArray *variables);
+BOOL RKStringHasBraceCharacters(NSString *string);
+BOOL RKIsValidSetOfVariables(NSArray *variables);
 @end
 
 @interface RKPathTemplateTests : SenTestCase
 @end
 
 @implementation RKPathTemplateTests
-
-- (void)testNumberOfLeftBracesInString
-{
-    expect(RKNumberOfLeftBracesInString(@"{")).to.equal(1);
-}
-
-- (void)testNumberOfRightBracesInString
-{
-    expect(RKNumberOfRightBracesInString(@"}")).to.equal(1);
-}
 
 - (void)testNumberOfSlashesInString
 {
@@ -64,37 +51,28 @@ BOOL *RKVariableStringsInArrayAreValid(NSArray *variables);
 
 - (void)testVariablesStringInArrayAreValid
 {
-    expect(^{ RKVariableStringsInArrayAreValid(@[ @"", @"", @""]); }).to.raise(NSInvalidArgumentException);
-    expect(^{ RKVariableStringsInArrayAreValid(@[ @"!@#$%^", @")(*!@#$", @"^$%@$@#$"]); }).to.raise(NSInvalidArgumentException);
-    expect(^{ RKVariableStringsInArrayAreValid(@[ @"{!@#$%^}", @"{)(*!@#$}", @"{^$%@$@#$}"]); }).to.raise(NSInvalidArgumentException);
-    expect(^{ RKVariableStringsInArrayAreValid(@[]); }).toNot.raise(NSInvalidArgumentException);
-    expect(^{ RKVariableStringsInArrayAreValid(@[ @"one", @"two", @"three" ]); }).toNot.raise(NSInvalidArgumentException);
-    expect(^{ RKVariableStringsInArrayAreValid(@[ @"one", @"two", @"three" ]); }).to.beTruthy();
-    expect(^{ RKVariableStringsInArrayAreValid(@[ @"variable_one", @"variable_two", @"variable_three" ]); }).toNot.raise(NSInvalidArgumentException);
-    expect(^{ RKVariableStringsInArrayAreValid(@[ @"variable_one", @"variable_two", @"variable_three" ]); }).to.beTruthy();
-    expect(^{ RKVariableStringsInArrayAreValid(@[ @"variable-one", @"variable-two", @"variable-three" ]); }).to.raise(NSInvalidArgumentException);
-}
-
-- (void)testComponentsOfStringMatchingPattern
-{
-    NSArray *matches = @[ @"one", @"two", @"three" ];
-    NSString *pattern = @"\\{(.*?)\\}";
-    expect(RKComponentsOfStringMatchingRegexPattern(@"/{one}/{two}/{three}", pattern)).to.equal(matches);
-    expect([RKComponentsOfStringMatchingRegexPattern(@"/{one}/{two}/{three}", pattern) count]).to.equal(3);
-    expect(RKComponentsOfStringMatchingRegexPattern(@"/one/two/three", pattern)).to.beEmpty();
+    expect(^{ RKIsValidSetOfVariables(@[ @"", @"", @""]); }).to.raise(NSInvalidArgumentException);
+    expect(^{ RKIsValidSetOfVariables(@[ @"!@#$%^", @")(*!@#$", @"^$%@$@#$"]); }).to.raise(NSInvalidArgumentException);
+    expect(^{ RKIsValidSetOfVariables(@[ @"{!@#$%^}", @"{)(*!@#$}", @"{^$%@$@#$}"]); }).to.raise(NSInvalidArgumentException);
+    expect(^{ RKIsValidSetOfVariables(@[]); }).toNot.raise(NSInvalidArgumentException);
+    expect(^{ RKIsValidSetOfVariables(@[ @"one", @"two", @"three" ]); }).toNot.raise(NSInvalidArgumentException);
+    expect(^{ RKIsValidSetOfVariables(@[ @"one", @"two", @"three" ]); }).to.beTruthy();
+    expect(^{ RKIsValidSetOfVariables(@[ @"variable_one", @"variable_two", @"variable_three" ]); }).toNot.raise(NSInvalidArgumentException);
+    expect(^{ RKIsValidSetOfVariables(@[ @"variable_one", @"variable_two", @"variable_three" ]); }).to.beTruthy();
+    expect(^{ RKIsValidSetOfVariables(@[ @"variable-one", @"variable-two", @"variable-three" ]); }).to.raise(NSInvalidArgumentException);
 }
 
 - (void)testInitThrowsInvalidExceptionWithNilString
 {
     expect(^{ (void)[[RKPathTemplate alloc] init]; }).to.raise(NSInternalInconsistencyException);
     expect(^{ (void)[RKPathTemplate new]; }).to.raise(NSInternalInconsistencyException);
-    expect(^{ (void)[[RKPathTemplate alloc] initWithString:nil]; }).to.raise(NSInvalidArgumentException);
-    expect(^{ (void)[[RKPathTemplate alloc] initWithString:@""]; }).to.raise(NSInvalidArgumentException);
+    expect(^{ (void)[RKPathTemplate pathTemplateWithString:nil]; }).to.raise(NSInvalidArgumentException);
+    expect(^{ (void)[RKPathTemplate pathTemplateWithString:@""]; }).to.raise(NSInvalidArgumentException);
 }
 
 - (void)testInitThrowsInvalidExceptionWithStringComposedOfWhitespace
 {
-    expect(^{ (void)[[RKPathTemplate alloc] initWithString:@"         "]; }).to.raise(NSInvalidArgumentException);
+    expect(^{ (void)[RKPathTemplate pathTemplateWithString:@"         "]; }).to.raise(NSInvalidArgumentException);
 }
 
 - (void)testClassInitializer
@@ -104,73 +82,114 @@ BOOL *RKVariableStringsInArrayAreValid(NSArray *variables);
 
 - (void)testIsEqual
 {
-    expect([[[RKPathTemplate alloc] initWithString:@"/static_segment/{variable_segment}/"] isEqual:[[RKPathTemplate alloc] initWithString:@"/static_segment/{variable_segment}/"]]).to.beTruthy();
-    expect([[[RKPathTemplate alloc] initWithString:@"/static_segment/{variable_segment}/"] isEqual:[[RKPathTemplate alloc] initWithString:@"/static_segment/{different_segment}/"]]).to.beFalsy();
+    expect([[RKPathTemplate pathTemplateWithString:@"/static_segment/{variable_segment}/"] isEqual:[RKPathTemplate pathTemplateWithString:@"/static_segment/{variable_segment}/"]]).to.beTruthy();
+    expect([[RKPathTemplate pathTemplateWithString:@"/static_segment/{variable_segment}/"] isEqual:[RKPathTemplate pathTemplateWithString:@"/static_segment/{different_segment}/"]]).to.beFalsy();
 }
 
 - (void)testHash
 {
-    RKPathTemplate *template1 = [[RKPathTemplate alloc] initWithString:@"/static_segment/{variable_segment}/"];
-    RKPathTemplate *template2 = [[RKPathTemplate alloc] initWithString:@"/static_segment/{variable_segment}/"];
+    RKPathTemplate *template1 = [RKPathTemplate pathTemplateWithString:@"/static_segment/{variable_segment}/"];
+    RKPathTemplate *template2 = [RKPathTemplate pathTemplateWithString:@"/static_segment/{variable_segment}/"];
     expect([template1 hash]).to.equal([template2 hash]);
-    template2 = [[RKPathTemplate alloc] initWithString:@"/static_segment/{different_segment}/"];
+    template2 = [RKPathTemplate pathTemplateWithString:@"/static_segment/{different_segment}/"];
     expect([template1 hash]).toNot.equal([template2 hash]);
+}
+
+- (void)testParsingStringWithoutVariables
+{
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/variable"];
+    expect(template.variables).to.beEmpty();
+}
+
+- (void)testParsingStringComposedEntirelyOfVariable
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/{variable}"]; }).notTo.raise(NSInvalidArgumentException);
+}
+
+- (void)testParsingVariableWithoutNameRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/{}"]; }).to.raiseWithReason(NSInvalidArgumentException, @"Invalid path template: '{}' is not a valid variable specifier.");
+}
+
+- (void)testParsingUnopenedVariableAtEndOfStringRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/variable}"]; }).to.raiseWithReason(NSInvalidArgumentException, @"Invalid path template: Unopened variable encountered. A '}' character must be preceded by a '{' character.");
+}
+
+- (void)testParsingUnopenedVariableRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/variable}/whatever"]; }).to.raiseWithReason(NSInvalidArgumentException, @"Invalid path template: Unopened variable encountered. A '}' character must be preceded by a '{' character.");
+}
+
+- (void)testParsingUnclosedVariableRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/{variable"]; }).to.raiseWithReason(NSInvalidArgumentException, @"Invalid path template: Unclosed variable encountered. A '{' character must be followed by a '}' character.");
+}
+
+- (void)testParsingDuplicatedVariableNameRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/{variable}/{variable}/end"]; }).to.raiseWithReason(NSInvalidArgumentException, @"Invalid path template: variable names must be unique.");
+}
+
+- (void)testParsingUnclosedCurlyBraceRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/{first_variable/{second_variable}"]; }).to.raise(NSInvalidArgumentException);
+}
+
+- (void)testParsingClosedBraceThatWasNotOpenedRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/first_variable}"]; }).to.raise(NSInvalidArgumentException);
+}
+
+- (void)testParsingVariableWithInvalidOperatorRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/{++var}"]; }).to.raise(NSInvalidArgumentException);
+}
+
+- (void)testParsingVariableWithInvalidVariableKeyRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/{var-name}"]; }).to.raise(NSInvalidArgumentException);
+}
+
+- (void)testThatAttemptToParseComponentContainingTwoVariablesRaisesException
+{
+    expect(^{ [RKPathTemplate pathTemplateWithString:@"/{variable1}_{variable2}"]; }).to.raiseWithReason(NSInvalidArgumentException, @"Invalid path template: A path component can only contain a single variable specifier.");
 }
 
 - (void)testVariablesAreCorrectlyParsed
 {
-    RKPathTemplate *template = [[RKPathTemplate alloc] initWithString:@"/{first_variable}/{second_variable}/{third_variable}.json"];
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/{first_variable}/{second_variable}/{third_variable}.json"];
     expect([[template variables] containsObject:@"first_variable"]).to.equal(YES);
     expect([[template variables] containsObject:@"second_variable"]).to.equal(YES);
     expect([[template variables] containsObject:@"third_variable"]).to.equal(YES);
-    template = [[RKPathTemplate alloc] initWithString:@"/first_variable/second_variable/third_variable.json"];
+    template = [RKPathTemplate pathTemplateWithString:@"/first_variable/second_variable/third_variable.json"];
     expect([template variables]).to.beEmpty();
-}
-
-- (void)testErrorIsReturnedOnAttemptToParseTemplateWithUnclosedCurlyBrace
-{
-    expect(^{ (void)[[RKPathTemplate alloc] initWithString:@"/{first_variable"]; }).to.raise(NSInvalidArgumentException);
-    expect(^{ (void)[[RKPathTemplate alloc] initWithString:@"/{first_variable/{second_variable}"]; }).to.raise(NSInvalidArgumentException);
-}
-
-- (void)testErrorIsReturnedOnAttemptToParseTemplateWithClosedBraceThatWasNotOpened
-{
-    expect(^{ (void)[[RKPathTemplate alloc] initWithString:@"/first_variable}"]; }).to.raise(NSInvalidArgumentException);
-}
-
-- (void)testErrorIsReturnedOnAttemptToParseVariableWithInvalidOperator
-{
-    expect(^{ (void)[[RKPathTemplate alloc] initWithString:@"/{++var}"]; }).to.raise(NSInvalidArgumentException);
-}
--(void)testErrorIsReturnedOnAttemptToParseVariableWithInvalidVariableKey
-{
-    expect(^{ (void)[[RKPathTemplate alloc] initWithString:@"/{var-name}"]; }).to.raise(NSInvalidArgumentException);
 }
 
 #pragma mark - String Expansion
 
 - (void)testThatExpandWithVariablesWithNil
 {
-    RKPathTemplate *template = [[RKPathTemplate alloc] initWithString:@"/{variable}"];
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/{variable}"];
     expect(^{ [template expandWithVariables:nil]; }).to.raise(NSInvalidArgumentException);
 }
 
 - (void)testThatExpandWithVariablesAcceptsEmptyDictionaryWithStaticPath
 {
-    RKPathTemplate *template = [[RKPathTemplate alloc] initWithString:@"/variable"];
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/variable"];
     expect(^{ [template expandWithVariables:@{}]; }).toNot.raise(NSInvalidArgumentException);
 }
 
 - (void)testThatExpandWithVariablesWithMissingVariableKey
 {
-    RKPathTemplate *template = [[RKPathTemplate alloc] initWithString:@"/{first_segment}/{second_segment}"];
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/{first_segment}/{second_segment}"];
     NSDictionary *variables = @{ @"first_segment" : @"something" };
     expect(^{ [template expandWithVariables:variables]; }).to.raise(NSInvalidArgumentException);
 }
 
 - (void)testThatExpandingtoStringWithNullExpandsToEmptyString
 {
-    RKPathTemplate *template = [[RKPathTemplate alloc] initWithString:@"/{first_segment}"];
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/{first_segment}"];
     NSDictionary *variables1 = @{ @"first_segment" : @"" };
     NSDictionary *variables2 = @{ @"first_segment" : [NSNull null] };
     NSLog(@"%@ %@", [template expandWithVariables:variables1], [template expandWithVariables:variables2]);
@@ -179,19 +198,19 @@ BOOL *RKVariableStringsInArrayAreValid(NSArray *variables);
 
 - (void)testThatExpandingtoStringWithUnknownVariableKeyThrowsException
 {
-    RKPathTemplate *template = [[RKPathTemplate alloc] initWithString:@"/{variable}"];
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/{variable}"];
     expect(^{ [template expandWithVariables:@{ @"something" : @"wrong" }]; }).to.raise(NSInvalidArgumentException);
 }
 
 - (void)testThatExpandingToStringReturnsExpectedString
 {
-    RKPathTemplate *template = [[RKPathTemplate alloc] initWithString:@"/{variable}"];
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/{variable}"];
     expect([template expandWithVariables:@{ @"variable" : @"correct" }]).to.equal(@"/correct");
 }
 
 - (void)testExpandingToStringFromInterpolatedObjects
 {
-    RKPathTemplate *template = [[RKPathTemplate alloc] initWithString:@"/people/{name}/{age}"];
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/people/{name}/{age}"];
     NSString *interpolatedPath = [template expandWithVariables:@{ @"name" : @"CuddleGuts",
                                                                   @"age" : [NSNumber numberWithInt:6] }];
     expect(interpolatedPath).to.equal(@"/people/CuddleGuts/6");
@@ -202,7 +221,7 @@ BOOL *RKVariableStringsInArrayAreValid(NSArray *variables);
 - (void)testShouldMatchPathsWithoutQueryArguments
 {
     NSDictionary *arguments;
-    RKPathTemplate *template = [[RKPathTemplate alloc] initWithString:@"github.com/{username}"];
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"github.com/{username}"];
     BOOL matches = [template matchesPath:@"github.com/jverkoey" variables:&arguments];
     expect(matches).to.equal(YES);
     expect(arguments).to.equal(@{ @"username": @"jverkoey" });
@@ -211,7 +230,7 @@ BOOL *RKVariableStringsInArrayAreValid(NSArray *variables);
 - (void)testShouldMatchPathsWithoutAnyArguments
 {
     NSDictionary *arguments;
-    RKPathTemplate *template = [[RKPathTemplate alloc] initWithString:@"/metadata"];
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/metadata"];
     BOOL matches = [template matchesPath:@"/metadata" variables:&arguments];
     expect(matches).to.equal(YES);
     expect(arguments).to.beEmpty();
@@ -220,7 +239,7 @@ BOOL *RKVariableStringsInArrayAreValid(NSArray *variables);
 - (void)testShouldPerformTwoMatchesInARow
 {
     NSDictionary *arguments;
-    RKPathTemplate *template = [[RKPathTemplate alloc] initWithString:@"/metadata/{apikey}"];
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/metadata/{apikey}"];
     BOOL matches = [template matchesPath:@"/metadata/{stateID}" variables:&arguments];
     expect(matches).to.equal(NO);
     expect(arguments).to.equal(@{ @"apikey" : @"{stateID}" });
@@ -231,14 +250,14 @@ BOOL *RKVariableStringsInArrayAreValid(NSArray *variables);
 
 - (void)testMatchingPathWithTrailingSlashAndQueryThrowsException
 {
-    RKPathTemplate *template = [[RKPathTemplate alloc] initWithString:@"/api/v1/organizations/"];
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/api/v1/organizations/"];
     expect(^{ [template matchesPath:@"/api/v1/organizations/?client_search=t" variables:nil]; }).to.raise(NSInvalidArgumentException);
 }
 
 - (void)testMatchingPathPatternWithTrailingSlash
 {
     NSDictionary *arguments;
-    RKPathTemplate *template = [[RKPathTemplate alloc] initWithString:@"/api/v1/organizations/{identifier}/"];
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/api/v1/organizations/{identifier}/"];
     BOOL matches = [template matchesPath:@"/api/v1/organizations/1/" variables:&arguments];
     expect(matches).to.equal(YES);
     expect(arguments).to.equal(@{ @"identifier": @"1" });
@@ -246,7 +265,7 @@ BOOL *RKVariableStringsInArrayAreValid(NSArray *variables);
 
 - (void)testMatchingPathPatternWithTrailingSlashAndWithoutTrailingSlashAreSame
 {
-    RKPathTemplate *template = [[RKPathTemplate alloc] initWithString:@"/api/"];
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/api/"];
     NSDictionary *arguments = @{};
     BOOL matches = [template matchesPath:@"/api" variables:&arguments];
     expect(matches).to.equal(YES);
@@ -254,7 +273,7 @@ BOOL *RKVariableStringsInArrayAreValid(NSArray *variables);
 
 - (void)testMatchingPathPatternWithLeadingSlashAndWithoutLeadingSlashAreDifferent
 {
-    RKPathTemplate *template = [[RKPathTemplate alloc] initWithString:@"/api"];
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/api"];
     NSDictionary *arguments = @{};
     BOOL matches = [template matchesPath:@"api" variables:&arguments];
     expect(matches).to.equal(NO);
@@ -263,11 +282,11 @@ BOOL *RKVariableStringsInArrayAreValid(NSArray *variables);
 - (void)testThatMatchingPathPatternsDoesNotMatchPathsShorterThanTheInput
 {
     NSString *path = @"/categories/some-category-name/articles/the-article-name";
-    RKPathTemplate *template1 = [[RKPathTemplate alloc] initWithString:@"/categories"];
+    RKPathTemplate *template1 = [RKPathTemplate pathTemplateWithString:@"/categories"];
     expect([template1 matchesPath:path variables:nil]).to.equal(NO);
-    RKPathTemplate *template2 = [[RKPathTemplate alloc] initWithString:@"/categories/{categoryName}"];
+    RKPathTemplate *template2 = [RKPathTemplate pathTemplateWithString:@"/categories/{categoryName}"];
     expect([template2 matchesPath:path variables:nil]).to.equal(NO);
-    RKPathTemplate *template3 = [[RKPathTemplate alloc] initWithString:@"/categories/some-category-name/articles/{articleSlug}"];
+    RKPathTemplate *template3 = [RKPathTemplate pathTemplateWithString:@"/categories/some-category-name/articles/{articleSlug}"];
     expect([template3 matchesPath:path variables:nil]).to.equal(YES);
 }
 

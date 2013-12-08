@@ -16,9 +16,14 @@ Pod::Spec.new do |s|
   
   s.subspec 'All' do |ss|    
     ss.dependency 'RKSupport/RKPathTemplate'
+    ss.dependency 'RKSupport/RKParameterConstraint'
   end
   
   s.subspec 'RKPathTemplate' do |ss|
     ss.source_files   = 'Code/RKPathTemplate/*'
+  end
+  
+  s.subspec 'RKParameterConstraint' do |ss|
+    ss.source_files   = 'Code/RKParameterConstraint/*'
   end
 end

@@ -216,13 +216,10 @@ static NSSet *RKScanVariablesFromString(NSString *string)
         matchesPath = [component matchesString:pathToMatch variable:[pathComponents objectAtIndex:idx]];
     }];
     
-    if (variables) {
-        *variables = [pathVariables copy];
-    }
-    // This is to ensure paths with leading slashes and without are different.
-    if ([self.pathTemplate hasPrefix:@"/"] && ![path hasPrefix:@"/"]) {
-        return NO;
-    }
+    if (variables) *variables = [pathVariables copy];
+
+    // Ensure paths with and without leading slashes are different.
+    if ([self.pathTemplate hasPrefix:@"/"] && ![path hasPrefix:@"/"]) return NO;
     
     return matchesPath;
 }
@@ -265,7 +262,7 @@ static NSSet *RKScanVariablesFromString(NSString *string)
 - (id)initWithString:(NSString *)string
 {
     if ([string length] == 0) {
-        @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Path Template String Should Not Be Nil or Length Zero." userInfo:nil];
+        @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Path Template String Should Not Be `nil` or Length Zero." userInfo:nil];
     }
     
     if ([[string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] length] == 0) {
@@ -296,7 +293,7 @@ static NSSet *RKScanVariablesFromString(NSString *string)
 - (id)init
 {
     @throw [NSException exceptionWithName:NSInternalInconsistencyException
-                                   reason:@"Failed to call the designated initializer. Invoke `initWithString:` instead."
+                                   reason:@"Failed to call the designated initializer. Invoke `pathTemplateWithString:` instead."
                                  userInfo:nil];
 }
 

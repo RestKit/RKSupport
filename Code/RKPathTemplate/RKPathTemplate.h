@@ -19,20 +19,48 @@
 //
 
 #import <Foundation/Foundation.h>
-/**
- Design Points:
 
- * This is a subset of the URI Template format. It does not support query parameters. Only paths and simple variables.
- * Templates are of the form "/static_segment/{variable_segment}/" vs old format of "/static/:variable"
- * Templates such as "/people/{personID}.json" should work.
- * Drop dependence on SOCKit. Use `NSScanner` or `NSRegularExpression` for underlying implementation.
- * Matches are exact. There must be the same number of segments in the pattern as the inputted path for a match to evaluate.
- * Should have a decent implementation of `isEqual:` and `hash` so that this can be used in a
- * This can be spun out into a standalone library. In fact you can build it in a seperate repository if you want.
- * Take a look at CSURITemplate to see what the full enchilada is like.
- * This replaces `RKPathMatcher`. See its implementation and test cases for reference
+/**
+ The `RKPathTemplate` class provides an interface for matching and expanding path strings that contain variable components. A valid path template is a string of Unicode characters that contains zero or more embedded variable expressions, each expression being delimited by a matching pair of braces ('{', '}').  The path template may not include a '?' query delimiter and a variable name may only appear once. The syntax is a subset of the URI Template specification (see RFC 6570 http://tools.ietf.org/html/rfc6570) that omits support for query strings and variable expression operators in order to support symmetrical matching and expansion operations.
+ 
+ # Path Matching
+ 
+ An `RKPathTemplate` object can be evaluated against a given path string in order to determine if it matches and extract all variable components into a dictionary. Path templates are delimited into components by the slash ('/') character. A template will only positively match an input path with exactly the same number of path components. Each static path component of the input string must also exactly match the corresponding component of the template. To better understand the matching semantics, consider the table below:
+ 
+ --------------------------------------------------------------------------------------------------------------------
+ | Path Template                 | Input Path                   | Matches? | Variables                              |
+ --------------------------------------------------------------------------------------------------------------------
+ | /users                        | /users                       | YES      | @{}                                    |
+ | /users                        | users                        | NO       | nil                                    |
+ | /users                        | users/                       | NO       | nil                                    |
+ | /users                        | friends                      | NO       | nil                                    |
+ | /{variable}                   | /whatever                    | YES      | @{ @"variable": @"whatever" }          |
+ | /users/{userID}               | /users/1234                  | YES      | @{ @"userID": @"1234" }                |
+ | /users/{userID}               | /users                       | NO       | nil                                    |
+ | /users/{userID}               | /users/1234/categories       | NO       | nil                                    |
+ | /categories/{name}/posts/{id} | /categories/News/posts/12345 | YES      | @{ @"name": @"News", @"id": @"12345" } |
+ --------------------------------------------------------------------------------------------------------------------
+ 
+ # Path Expansion
+ 
+ A `RKPathTemplate` object can be expanded into a full path by providing a dictionary of variables. The dictionary must contain an entry for each variable contained within the template. Variables in the given dictionary that are not used within the template being expanded are ignored. Each entry in the dictionary must have a key and value that is an `NSString` object or responds to the `stringValue` message. To better understand the expansion sematnics, consider the table below:
+ 
+ -----------------------------------------------------------------------------------------
+ | Path Template           | Variables                           | Path                  |
+ -----------------------------------------------------------------------------------------
+ | /users                  | @{ @"id": @"1234" }                 | /users                |
+ | /users/{userID}         | @{ @"id": @"1234" }                 | /users/1234           |
+ | /users/{userID}         | @{ @"name": @"Joe" }                | nil                   |
+ | /posts/{id}/tags/{name} | @{ @"id": @321, @"name": @"funny" } | /posts/321/tags/funny |
+ | /posts/{id}/tags/{name} | @{ @"name": @"funny" }              | nil                   |
+ -----------------------------------------------------------------------------------------
+
  */
 @interface RKPathTemplate : NSObject <NSCopying, NSCoding>
+
+///------------------------------
+/// @name Creating Path Templates
+///------------------------------
 
 /**
  Creates and returns a new path template object initialized with the given string.
@@ -42,12 +70,20 @@
  */
 + (instancetype)pathTemplateWithString:(NSString *)string;
 
+///-----------------------------------
+/// @name Accessing Template Variables
+///-----------------------------------
+
 /**
  Returns the set of variable names parsed from the template.
  
  For example, a path template of `@"/users/{userID}/categories/{categoryID}"` would return a set of variables containing `@"userID"` and `@"categoryID"`.
  */
 @property (nonatomic, readonly) NSSet *variables;
+
+///------------------------------------------
+/// @name Matching Paths Against the Template
+///------------------------------------------
 
 /**
  Evaluates the given path against the receiver and returns a Boolean value indicating if the match was successful, optionally returning a dictionary of values keyed by variable name matched from the given path.
@@ -57,6 +93,10 @@
  @return A Boolean value indicating if the match was successful.
  */
 - (BOOL)matchesPath:(NSString *)path variables:(NSDictionary **)variables;
+
+///----------------------------------------
+/// @name Expanding Paths From the Template
+///----------------------------------------
 
 /**
  Expands the receiver into a full path string using the given dictionary of variables. If the dictionary does not contain an entry for each variable used in the template then `nil` is returned.

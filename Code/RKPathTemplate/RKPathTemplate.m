@@ -255,6 +255,18 @@ static NSSet *RKScanVariablesFromString(NSString *string)
     return copy;
 }
 
+#pragma mark - NSCoding 
+
+- (id)initWithCoder:(NSCoder *)aDecoder
+{
+    return [RKPathTemplate pathTemplateWithString:[aDecoder decodeObjectForKey:@"pathTemplate"]];
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+    [aCoder encodeObject:self.pathTemplate forKey:@"pathTemplate"];
+}
+
 #pragma mark - Initialization
 
 - (id)initWithString:(NSString *)string

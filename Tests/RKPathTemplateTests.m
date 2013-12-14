@@ -95,6 +95,20 @@ BOOL RKIsValidSetOfVariables(NSArray *variables);
     expect([template1 hash]).toNot.equal([template2 hash]);
 }
 
+#pragma mark - NSCoding
+
+-(void)testNSCodingProtocol
+{
+    RKPathTemplate *template1 = [RKPathTemplate pathTemplateWithString:@"/static_segment/{variable_segment_one}/"];
+    RKPathTemplate *template2 = [RKPathTemplate pathTemplateWithString:@"/static_segment/{variable_segment_two}/"];
+    NSArray *templates = @[ template1, template2];
+    NSData *archivedData = [NSKeyedArchiver archivedDataWithRootObject:templates];
+    [[NSUserDefaults standardUserDefaults] setObject:archivedData forKey:@"templates"];
+    NSData *unarchivedData = [[NSUserDefaults standardUserDefaults] objectForKey:@"templates"];
+    NSArray *unarchivedTemplates = [NSKeyedUnarchiver unarchiveObjectWithData:unarchivedData];
+    expect(templates).to.equal(unarchivedTemplates);
+}
+
 - (void)testParsingStringWithoutVariables
 {
     RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/variable"];

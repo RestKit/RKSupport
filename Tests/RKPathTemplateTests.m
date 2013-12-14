@@ -290,4 +290,18 @@ BOOL RKIsValidSetOfVariables(NSArray *variables);
     expect([template3 matchesPath:path variables:nil]).to.equal(YES);
 }
 
+#pragma mark - NSCopying
+
+- (void)testCopy
+{
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/{first_variable}/{second_variable}/{third_variable}.json"];
+    expect([[template variables] containsObject:@"first_variable"]).to.equal(YES);
+    expect([[template variables] containsObject:@"second_variable"]).to.equal(YES);
+    expect([[template variables] containsObject:@"third_variable"]).to.equal(YES);
+    RKPathTemplate *copy = [template copy];
+    expect([[copy variables] containsObject:@"first_variable"]).to.equal(YES);
+    expect([[copy variables] containsObject:@"second_variable"]).to.equal(YES);
+    expect([[copy variables] containsObject:@"third_variable"]).to.equal(YES);
+}
+
 @end

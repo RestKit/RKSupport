@@ -247,6 +247,11 @@ static NSSet *RKScanVariablesFromString(NSString *string)
     return [self hash] == [object hash];
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@ %p: pathTemplate:%@>", NSStringFromClass(self.class), self, self.pathTemplate];
+}
+
 #pragma mark - NSCopying
 
 - (id)copyWithZone:(NSZone *)zone

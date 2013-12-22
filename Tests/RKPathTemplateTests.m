@@ -206,7 +206,6 @@ BOOL RKIsValidSetOfVariables(NSArray *variables);
     RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/{first_segment}"];
     NSDictionary *variables1 = @{ @"first_segment" : @"" };
     NSDictionary *variables2 = @{ @"first_segment" : [NSNull null] };
-    NSLog(@"%@ %@", [template expandWithVariables:variables1], [template expandWithVariables:variables2]);
     expect([[template expandWithVariables:variables1] isEqualToString:[template expandWithVariables:variables2]]).to.equal(YES);
 }
 

@@ -8,14 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		25A0134C17DBC212006C2BD6 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25A0134B17DBC212006C2BD6 /* SenTestingKit.framework */; };
-		25A0134E17DBC212006C2BD6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25A0134D17DBC212006C2BD6 /* UIKit.framework */; };
-		25A0135017DBC212006C2BD6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25A0134F17DBC212006C2BD6 /* Foundation.framework */; };
 		25A0136417DBC225006C2BD6 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25A0134B17DBC212006C2BD6 /* SenTestingKit.framework */; };
 		25A0136617DBC225006C2BD6 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25A0136517DBC225006C2BD6 /* Cocoa.framework */; };
 		3515F08DE8EE495D968E7CDA /* libPods-osx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 169BB4EE1051441592FCCA22 /* libPods-osx.a */; };
+		AA46E8BE1867451A00F7FCC2 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA46E8BD1867451A00F7FCC2 /* UIKit.framework */; };
+		AA46E8C01867452400F7FCC2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA46E8BF1867452400F7FCC2 /* Foundation.framework */; };
 		AF161B4D21694D2493A63064 /* libPods-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C4355EA794D84F2BB2496AF8 /* libPods-ios.a */; };
 		FC0219151841784900771C5E /* RKPathTemplateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FC0219141841784900771C5E /* RKPathTemplateTests.m */; };
 		FC0219161841784900771C5E /* RKPathTemplateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FC0219141841784900771C5E /* RKPathTemplateTests.m */; };
+		FC5315121854F0ED00D27979 /* RKParameterContstraintTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5315111854F0ED00D27979 /* RKParameterContstraintTests.m */; };
+		FC5315131854F0ED00D27979 /* RKParameterContstraintTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5315111854F0ED00D27979 /* RKParameterContstraintTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,16 +25,17 @@
 		193F69FEEBC443C283E5F0E4 /* Pods-ios.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios.xcconfig"; path = "../Pods/Pods-ios.xcconfig"; sourceTree = "<group>"; };
 		25A0134817DBC212006C2BD6 /* iOS Tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Tests.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		25A0134B17DBC212006C2BD6 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
-		25A0134D17DBC212006C2BD6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
-		25A0134F17DBC212006C2BD6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		25A0136317DBC225006C2BD6 /* OS X Tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OS X Tests.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		25A0136517DBC225006C2BD6 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		25A0136817DBC225006C2BD6 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		25A0136917DBC225006C2BD6 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		25A0136A17DBC225006C2BD6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		AA46E8BD1867451A00F7FCC2 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		AA46E8BF1867452400F7FCC2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		C4355EA794D84F2BB2496AF8 /* libPods-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF2E27B855724C1EA1E411FD /* Pods-osx.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-osx.xcconfig"; path = "../Pods/Pods-osx.xcconfig"; sourceTree = "<group>"; };
 		FC0219141841784900771C5E /* RKPathTemplateTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPathTemplateTests.m; sourceTree = "<group>"; };
+		FC5315111854F0ED00D27979 /* RKParameterContstraintTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKParameterContstraintTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -40,9 +43,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA46E8C01867452400F7FCC2 /* Foundation.framework in Frameworks */,
+				AA46E8BE1867451A00F7FCC2 /* UIKit.framework in Frameworks */,
 				25A0134C17DBC212006C2BD6 /* SenTestingKit.framework in Frameworks */,
-				25A0134E17DBC212006C2BD6 /* UIKit.framework in Frameworks */,
-				25A0135017DBC212006C2BD6 /* Foundation.framework in Frameworks */,
 				AF161B4D21694D2493A63064 /* libPods-ios.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -83,9 +86,9 @@
 		25A0134A17DBC212006C2BD6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AA46E8BF1867452400F7FCC2 /* Foundation.framework */,
+				AA46E8BD1867451A00F7FCC2 /* UIKit.framework */,
 				25A0134B17DBC212006C2BD6 /* SenTestingKit.framework */,
-				25A0134D17DBC212006C2BD6 /* UIKit.framework */,
-				25A0134F17DBC212006C2BD6 /* Foundation.framework */,
 				25A0136517DBC225006C2BD6 /* Cocoa.framework */,
 				25A0136717DBC225006C2BD6 /* Other Frameworks */,
 				C4355EA794D84F2BB2496AF8 /* libPods-ios.a */,
@@ -108,6 +111,7 @@
 			isa = PBXGroup;
 			children = (
 				FC0219141841784900771C5E /* RKPathTemplateTests.m */,
+				FC5315111854F0ED00D27979 /* RKParameterContstraintTests.m */,
 			);
 			name = Tests;
 			sourceTree = "<group>";
@@ -292,6 +296,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC5315121854F0ED00D27979 /* RKParameterContstraintTests.m in Sources */,
 				FC0219151841784900771C5E /* RKPathTemplateTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -300,6 +305,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC5315131854F0ED00D27979 /* RKParameterContstraintTests.m in Sources */,
 				FC0219161841784900771C5E /* RKPathTemplateTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

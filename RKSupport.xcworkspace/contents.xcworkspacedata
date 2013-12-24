@@ -5,6 +5,16 @@
       location = "group:Code"
       name = "Code">
       <Group
+         location = "group:RKParameterConstraint"
+         name = "RKParameterConstraint">
+         <FileRef
+            location = "group:RKParameterConstraint.h">
+         </FileRef>
+         <FileRef
+            location = "group:RKParameterConstraint.m">
+         </FileRef>
+      </Group>
+      <Group
          location = "group:RKPathTemplate"
          name = "RKPathTemplate">
          <FileRef

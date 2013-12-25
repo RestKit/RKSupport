@@ -24,7 +24,6 @@
 #import <RKSupport/RKPathTemplate.h>
 
 @interface RKPathTemplate ()
-NSUInteger RKNumberOfSlashesInString(NSString *string);
 BOOL RKStringHasBraceCharacters(NSString *string);
 BOOL RKIsValidSetOfVariables(NSArray *variables);
 @end
@@ -33,11 +32,6 @@ BOOL RKIsValidSetOfVariables(NSArray *variables);
 @end
 
 @implementation RKPathTemplateTests
-
-- (void)testNumberOfSlashesInString
-{
-    expect(RKNumberOfSlashesInString(@"/")).to.equal(1);
-}
 
 - (void)testStringHasBraceCharacters
 {

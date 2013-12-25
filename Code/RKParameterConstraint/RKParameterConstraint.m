@@ -146,7 +146,7 @@ NSString *const RKRequiredParametersKey = @"RKRequiredParametersKey";
     }
     for (NSString *parameter in [constraints allKeys]) {
         id value = [constraints objectForKey:parameter];
-        if (![self validateParameter:parameter value:value error:&error]) return NO;
+        if (![self validateParameter:parameter value:value error:error]) return NO;
     }
     return YES;
 }

@@ -20,16 +20,7 @@
 
 #import "RKPathTemplate.h"
 
-NSUInteger RKNumberOfSlashesInString(NSString *string)
-{
-    static NSRegularExpression *regex = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        regex = [NSRegularExpression regularExpressionWithPattern:@"/" options:NSRegularExpressionCaseInsensitive error:nil];
-    });
-    return [regex numberOfMatchesInString:string options:0 range:NSMakeRange(0, [string length])];
-}
-
+BOOL RKIsValidSetOfVariables(NSSet *variables);
 BOOL RKIsValidSetOfVariables(NSSet *variables)
 {
     NSMutableCharacterSet *parameterCharacterSet = [NSMutableCharacterSet alphanumericCharacterSet];
@@ -44,7 +35,8 @@ BOOL RKIsValidSetOfVariables(NSSet *variables)
     return YES;
 }
 
-BOOL *RKStringHasBraceCharacters(NSString *string)
+BOOL RKStringHasBraceCharacters(NSString *string);
+BOOL RKStringHasBraceCharacters(NSString *string)
 {
     if (string == nil) return NO;
     if ([string rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"{}"]].location == NSNotFound) return NO;
@@ -185,7 +177,7 @@ static NSSet *RKScanVariablesFromString(NSString *string)
 
 - (BOOL)matchesPath:(NSString *)path variables:(NSDictionary **)variables
 {
-    NSMutableString *pathToMatch = [path mutableCopy];
+    NSString *pathToMatch = [path copy];
     if ([pathToMatch rangeOfString:@"?"].location != NSNotFound) {
         @throw [NSException exceptionWithName:NSInvalidArgumentException reason:[NSString stringWithFormat:@"Path Should Not Contain Query String:%@", [path substringFromIndex:[pathToMatch rangeOfString:@"?"].location]] userInfo:nil];
     }
@@ -199,7 +191,7 @@ static NSSet *RKScanVariablesFromString(NSString *string)
         pathToMatch = [pathToMatch substringFromIndex:1];
     }
 
-    NSMutableArray *pathComponents = [pathToMatch pathComponents];
+    NSArray *pathComponents = [pathToMatch pathComponents];
     if ([pathComponents count] != [self.pathComponents count]) {
         return NO;
     }
@@ -286,7 +278,7 @@ static NSSet *RKScanVariablesFromString(NSString *string)
 
     if (self = [super init]) {
         self.pathTemplate = [string copy];
-        NSArray *variables = RKScanVariablesFromString(string);
+        NSSet *variables = RKScanVariablesFromString(string);
         if (RKIsValidSetOfVariables(variables)) {
             self.variables = variables;
         }

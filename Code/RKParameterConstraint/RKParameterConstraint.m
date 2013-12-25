@@ -165,7 +165,7 @@ NSString *const RKRequiredParametersKey = @"RKRequiredParametersKey";
         *error = [NSError errorWithDomain:RKParameterConstraintErrorDomain code:0 userInfo:valueError.userInfo];
         return NO;
     }
-    return YES;
+    return validParameter && validValue;
 }
 
 + (BOOL)containsAllStrings:(NSArray *)keys

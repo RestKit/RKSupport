@@ -199,11 +199,12 @@ static NSSet *RKScanVariablesFromString(NSString *string)
     NSMutableDictionary *pathVariables = [NSMutableDictionary new];
     [self.pathComponents enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         RKPathTemplateComponent *component = (RKPathTemplateComponent *)obj;
+        NSString *variable;
         if (RKStringHasBraceCharacters(component.path)) {
-            NSString *variable = [component.path substringWithRange:NSMakeRange(1, [component.path length] - 2)];
+            variable = [component.path substringWithRange:NSMakeRange(1, [component.path length] - 2)];
             [pathVariables setObject:[pathComponents objectAtIndex:idx] forKey:variable];
         }
-        matchesPath = [component matchesString:pathToMatch variable:[pathComponents objectAtIndex:idx]];
+        matchesPath = [component matchesString:[pathComponents objectAtIndex:idx] variable:variable];
     }];
     
     if (variables) *variables = [pathVariables copy];

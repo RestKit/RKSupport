@@ -234,6 +234,15 @@ BOOL RKIsValidSetOfVariables(NSArray *variables);
     expect(arguments).to.equal(@{ @"username": @"jverkoey" });
 }
 
+- (void)testShouldMatchPathsThatAreTheSameAndAreGreaterThanOneComponentsLong
+{
+    NSDictionary *arguments;
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"/hi/bye"];
+    BOOL matches = [template matchesPath:@"/hi/bye" variables:&arguments];
+    expect(matches).to.equal(YES);
+    expect(arguments).to.beEmpty();
+}
+
 - (void)testShouldMatchPathsWithoutAnyArguments
 {
     NSDictionary *arguments;

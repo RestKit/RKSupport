@@ -234,6 +234,15 @@ BOOL RKIsValidSetOfVariables(NSArray *variables);
     expect(arguments).to.equal(@{ @"username": @"jverkoey" });
 }
 
+- (void)testShouldReturnCorrectArgumentsWhenTemplateWhenContainExtensions
+{
+    NSDictionary *arguments;
+    RKPathTemplate *template = [RKPathTemplate pathTemplateWithString:@"github.com/{username}.json"];
+    BOOL matches = [template matchesPath:@"github.com/jverkoey.json" variables:&arguments];
+    expect(matches).to.equal(YES);
+    expect(arguments).to.equal(@{ @"username": @"jverkoey" });
+}
+
 - (void)testShouldMatchPathsThatAreTheSameAndAreGreaterThanOneComponentsLong
 {
     NSDictionary *arguments;

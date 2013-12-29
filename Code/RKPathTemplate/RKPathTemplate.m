@@ -201,8 +201,9 @@ static NSSet *RKScanVariablesFromString(NSString *string)
         RKPathTemplateComponent *component = (RKPathTemplateComponent *)obj;
         NSString *variable;
         if (RKStringHasBraceCharacters(component.path)) {
-            variable = [component.path substringWithRange:NSMakeRange(1, [component.path length] - 2)];
-            [pathVariables setObject:[pathComponents objectAtIndex:idx] forKey:variable];
+            NSArray *variables = [RKScanVariablesFromString(component.path) allObjects];
+            variable = [variables firstObject];
+            [pathVariables setObject:[[pathComponents objectAtIndex:idx] stringByDeletingPathExtension] forKey:variable];
         }
         matchesPath = [component matchesString:[pathComponents objectAtIndex:idx] variable:variable];
     }];
